@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(HelpMessage = "The GitHub token running the action", Mandatory = $true)]
     [string] $Token,
     [Parameter(HelpMessage = "Determined build order, including build dimensions, compressed JSON format", Mandatory = $true)]
@@ -15,7 +15,7 @@ try {
         throw "No AL-Go build dimensions defined."
     }
     Write-AlpacaOutput "Creating containers for build dimensions: '$((  $BuildOrder.buildDimensions | ForEach-Object{$_.project + " - " + $_.buildMode}) -join "', '")' [$($BuildOrder.buildDimensions.Count)]"
-} 
+}
 catch {
     throw "Failed to determine AL-Go build dimensions:`n$_"
 }
