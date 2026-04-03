@@ -1,4 +1,4 @@
-param(
+﻿param(
     [hashtable] $params
 )
 Write-AlpacaOutput "Using COSMO Alpaca override"
@@ -27,16 +27,12 @@ if (Get-AlpacaIsDebugMode) {
     }
 }
 
-if ($env:RUNNER_OS -ne 'Windows') {
-    Write-AlpacaError "Running Page Scripting Tests is only supported on Windows runners. Set githubRunner to 'windows-latest'. See https://aka.ms/algosettings#githubRunner"
-    throw
-}
-
 Write-AlpacaOutput "Overriding start address to Environment value: $($environment)" # $environment comes from parent script
 $params.startAddress = $environment # modify the hashtable parameter
 
 Write-AlpacaOutput ("Overriding credential to BcAuthContext credential (User: {0})" -f $(try { $bcAuthContext.username }catch { "" })) # bcAuthContext comes from parent script
 $params.credential = New-Object System.Management.Automation.PSCredential ($bcAuthContext.username, $bcAuthContext.Password) # modify the hashtable parameter
-        
+
 Write-AlpacaOutput "Invoking parent RunPageScriptingTests with modified parameters"
 RunPageScriptingTests @params # invoke parent
+

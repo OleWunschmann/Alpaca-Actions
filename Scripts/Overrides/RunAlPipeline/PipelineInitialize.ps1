@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(Mandatory = $true)]
     [hashtable] $Jobs,
     [Parameter(Mandatory = $true)]
@@ -6,6 +6,12 @@ param(
 )
 
 Import-Module (Join-Path $ScriptsPath "Modules/Alpaca.psd1") -Scope Global -DisableNameChecking
+
+function ConvertTo-AlpacaSecurePassword {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingConvertToSecureStringWithPlainText', '', Justification = 'Password value is a runtime secret provided by AL-Go, not a literal plaintext string')]
+    param([string] $PlainText)
+    return ConvertTo-SecureString -String $PlainText -AsPlainText
+}
 
 # Collect informations
 
@@ -31,7 +37,7 @@ if (! $container) {
 Write-AlpacaOutput "Get container authentication context from Alpaca container information"
 $containerAuthContext = @{
     username = $container.User
-    Password = ConvertTo-SecureString -String $container.Password -AsPlainText
+    Password = ConvertTo-AlpacaSecurePassword -PlainText $container.Password
 }
 
 Write-AlpacaGroupEnd
@@ -85,8 +91,8 @@ $overridesPath = Join-Path $ScriptsPath "Overrides/RunAlPipeline"
 
 Write-AlpacaOutput "Load Alpaca overrides from $(Resolve-Path $overridesPath -Relative)"
 
-Get-Item -Path $overridesPath | 
-    Get-ChildItem -Filter "*.ps1" -Exclude "PipelineInitialize.*" -File | 
+Get-Item -Path $overridesPath |
+    Get-ChildItem -Filter "*.ps1" -Exclude "PipelineInitialize.*" -File |
     ForEach-Object {
         $scriptPath = $_.FullName
         $scriptName = $_.BaseName
